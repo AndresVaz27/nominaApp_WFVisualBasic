@@ -356,59 +356,28 @@ Public Class Form1
     ''' <param name="sender">DataGridView</param>
     ''' <param name="e">DataGridViewCellEventArgs</param>
     Private Sub dgvAddEmployee_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgvAddEmployee.CellDoubleClick
-        Try
-            If e.RowIndex >= 0 AndAlso e.ColumnIndex >= 0 Then
-                ' Get Image Path
-                Dim imagePath As String = dgvAddEmployee.Rows(e.RowIndex).Cells(3).Value.ToString()
-                ' Show the image in both picture boxes
-                pbxEmployee.Image = Image.FromFile(imagePath)
-                pbxPayroll.Image = Image.FromFile(imagePath)
-                ' Show Employee's Name in both textboxes
-                txtName.Text = dgvAddEmployee.Rows(e.RowIndex).Cells(0).Value.ToString()
-                txtNamePayroll.Text = dgvAddEmployee.Rows(e.RowIndex).Cells(0).Value.ToString()
-                ' Show Employee's Salary per Hour in both Numeric Controls
-                numericSalary.Value = Convert.ToDecimal(dgvAddEmployee.Rows(e.RowIndex).Cells(2).Value)
-                numericSalaryPayroll.Value = Convert.ToDecimal(dgvAddEmployee.Rows(e.RowIndex).Cells(2).Value)
-                lblDepartmentPayroll.Text = dgvAddEmployee.Rows(e.RowIndex).Cells(1).Value.ToString()
-                numericHours.Value = 0
-                numericRestDay.Value = 0
-                numericHoliday.Value = 0
-                numericBonus.Value = 0
-                numericPerceptions.Value = 0
-                numericAbsence.Value = 0
-                numericDiscount.Value = 0
-                numericDeductions.Value = 0
-                numericPay.Value = 0
-            Else
-                txtNamePayroll.Text = String.Empty
-                numericSalaryPayroll.Value = 0
-                pbxPayroll.Image = Nothing
-                lblDepartmentPayroll.Text = String.Empty
-                numericHours.Value = 0
-                numericRestDay.Value = 0
-                numericHoliday.Value = 0
-                numericBonus.Value = 0
-                numericPerceptions.Value = 0
-                numericAbsence.Value = 0
-                numericDiscount.Value = 0
-                numericDeductions.Value = 0
-                numericPay.Value = 0
-                Return
-            End If
-        Catch ex As Exception
-            txtName.Text = String.Empty
-            numericSalary.Value = 0
-            For i As Integer = 0 To Me.checkedDepartment.Items.Count - 1
-                Me.checkedDepartment.SetItemChecked(i, False)
-            Next
-            Me.checkedDepartment.ClearSelected()
-            pbxEmployee.Image = Nothing
-            txtNamePayroll.Text = String.Empty
-            numericSalaryPayroll.Value = 0
-            lblDepartmentPayroll.Text = String.Empty
-            pbxPayroll.Image = Nothing
-            MessageBox.Show("Unable to show Employee's Info")
-        End Try
+        Dim dr As DialogResult = MessageBox.Show("Would you like to delete this row?", "Delete Row", MessageBoxButtons.YesNo)
+        Select Case dr
+            Case DialogResult.Yes
+                Try
+                    Dim selectedrow As DataGridViewRow = dgvAddEmployee.Rows(e.RowIndex) ' Get selected row's index
+                    dgvAddEmployee.Rows.Remove(selectedrow)
+                    txtName.Text = String.Empty
+                    txtNamePayroll.Text = String.Empty
+                    numericSalary.Value = 0
+                    numericSalaryPayroll.Value = 0
+                    For i As Integer = 0 To Me.checkedDepartment.Items.Count - 1
+                        Me.checkedDepartment.SetItemChecked(i, False)
+                    Next
+                    lblDepartmentPayroll.Text = String.Empty
+                    pbxEmployee.Image = Nothing
+                    pbxPayroll.Image = Nothing
+                Catch ex As Exception
+                    MessageBox.Show(ex.Message)
+                End Try
+            Case DialogResult.No
+                Exit Select
+        End Select
     End Sub
 
     Private Sub dgvAddEmployee_KeyDown(sender As Object, e As KeyEventArgs) Handles dgvAddEmployee.KeyDown
