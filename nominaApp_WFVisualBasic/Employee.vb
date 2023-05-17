@@ -65,7 +65,10 @@
         Return Bono = salary * porcentajeBono_
     End Function
 
-    Public Sub New(ByVal name As String, ByVal salary As Decimal, ByVal department As String, ByVal imagePath As String, ByVal photoPath As String, ByVal dataGridView As DataGridView, ByVal nameTextBox As TextBox, ByVal salaryNumericUpDown As NumericUpDown, ByVal departmentCheckedListBox As CheckedListBox, ByVal employeePictureBox As PictureBox, ByVal openFileDialog As OpenFileDialog)
+    Public Sub New(ByVal name As String, ByVal salary As Decimal, ByVal department As String, ByVal imagePath As String,
+                   ByVal photoPath As String, ByVal dataGridView As DataGridView, ByVal nameTextBox As TextBox,
+                   ByVal salaryNumericUpDown As NumericUpDown, ByVal departmentCheckedListBox As CheckedListBox,
+                   ByVal employeePictureBox As PictureBox, ByVal openFileDialog As OpenFileDialog)
         If name = "" Then
             MessageBox.Show("Name Required.")
             Return
@@ -79,8 +82,8 @@
             Return
         End If
         Me.Name = name
-        Me.salary = salary
-        Me.department = department
+        Me.Salary = salary
+        Me.Department = department
         If imagePath = String.Empty Then
             Me.ImagePath = photoPath
         Else
@@ -94,7 +97,7 @@
         Me.OpenFileDialog_ = openFileDialog
 
         ' Agregar Row a la DataGridView con la info del empleado.
-        Me.DataGridView_.Rows.Add(Me.Name, Me.department, Me.salary, Me.ImagePath)
+        Me.DataGridView_.Rows.Add(Me.Name, Me.Department, Me.Salary, Me.ImagePath)
         ' Display a success message
         MessageBox.Show(ToString())
         ' Clear Controls
