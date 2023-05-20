@@ -1,4 +1,5 @@
-﻿Friend Class Employee
+﻿Imports System.IO
+Friend Class Employee
     Inherits Person
     Implements IBono
 
@@ -7,7 +8,7 @@
     Private DataGridView_ As DataGridView
     Private NameTextBox_ As TextBox
     Private SalaryNumericUpDown_ As NumericUpDown
-    Private DepartmentCheckedListBox_ As CheckedListBox
+    Private ComboBox_ As ComboBox
     Private EmployeePictureBox_ As PictureBox
     Private OpenFileDialog_ As OpenFileDialog
     Public porcentajeBono_ As Decimal
@@ -47,34 +48,31 @@
         End Set
     End Property
 
-    Public Function CalcularBono() As Decimal Implements IBono.CalcularBono
-        porcentajeBono_ = 0
+    Public Function CalcularBono(departamento As String) As Decimal Implements IBono.CalcularBono
+        Dim lineas As String() = File.ReadAllLines("departamentos.txt") ' Read every line from the file
+        For Each linea As String In lineas
+            Dim datos As String() = linea.Split(","c) ' Divide la línea en los datos separados por comas
+            If datos(0).Trim() = departamento Then
+                Dim porcentaje As Decimal = Decimal.Parse(datos(1).Trim())
+                Bono = porcentaje
+                Return Bono
+            End If
+        Next
 
-        Select Case department
-            Case "Sales"
-                porcentajeBono_ = 0.2D
-                Exit Select
-            Case "Manager"
-                porcentajeBono_ = 0.15D
-                Exit Select
-            Case "Assistant Manager"
-                porcentajeBono_ = 0.1D
-                Exit Select
-        End Select
-
-        Return Bono = salary * porcentajeBono_
+        Return 0 ' Devuelve 0 si no se encuentra el departamento
     End Function
 
-    Public Sub New(ByVal name As String, ByVal salary As Decimal, ByVal department As String, ByVal imagePath As String,
-                   ByVal photoPath As String, ByVal dataGridView As DataGridView, ByVal nameTextBox As TextBox,
-                   ByVal salaryNumericUpDown As NumericUpDown, ByVal departmentCheckedListBox As CheckedListBox,
-                   ByVal employeePictureBox As PictureBox, ByVal openFileDialog As OpenFileDialog)
+    Public Sub New(ByVal name As String, ByVal salary As Decimal, ByVal department As String, ByVal imagePath As String, ByVal photoPath As String, ByVal dataGridView As DataGridView, ByVal nameTextBox As TextBox, ByVal salaryNumericUpDown As NumericUpDown, ByVal comboBox As ComboBox, ByVal employeePictureBox As PictureBox, ByVal openFileDialog As OpenFileDialog)
         If name = "" Then
             MessageBox.Show("Name Required.")
             Return
         End If
+        If salary = 0 Then
+            MessageBox.Show("Salary must not be '0'.")
+            Return
+        End If
         If department = "" Then
-            MessageBox.Show("Deparment Required.")
+            MessageBox.Show("Department Required.")
             Return
         End If
         If imagePath = "" AndAlso photoPath Is Nothing Then
@@ -92,27 +90,24 @@
         Me.DataGridView_ = dataGridView
         Me.NameTextBox_ = nameTextBox
         Me.SalaryNumericUpDown_ = salaryNumericUpDown
-        Me.DepartmentCheckedListBox_ = departmentCheckedListBox
+        Me.ComboBox_ = comboBox
         Me.EmployeePictureBox_ = employeePictureBox
         Me.OpenFileDialog_ = openFileDialog
+        Dim salaryXhours As Decimal = salary * 40
+        Dim bono As Decimal = salaryXhours * CalcularBono(Me.Department)
+        Dim pay As Decimal = salaryXhours + bono
 
         ' Agregar Row a la DataGridView con la info del empleado.
-        Me.DataGridView_.Rows.Add(Me.Name, Me.Department, Me.Salary, Me.ImagePath)
-        ' Display a success message
+        Me.DataGridView_.Rows.Add(Me.Name, Me.Department, Me.Salary, Me.ImagePath, pay, 40, 0, 0, bono, pay, 0, 0, 0)
         MessageBox.Show(ToString())
         ' Clear Controls
         Me.NameTextBox_.Clear()
         Me.OpenFileDialog_.FileName = String.Empty
         Me.SalaryNumericUpDown_.Value = 0
         Me.EmployeePictureBox_.Image = Nothing
-        For i As Integer = 0 To Me.DepartmentCheckedListBox_.Items.Count - 1
-            Me.DepartmentCheckedListBox_.SetItemChecked(i, False)
-        Next
-        Me.DepartmentCheckedListBox_.ClearSelected()
     End Sub
-
     Public Sub New()
-        ' Sin declarar nada.
+        CalcularBono(Department)
     End Sub
 
     'Finalize()

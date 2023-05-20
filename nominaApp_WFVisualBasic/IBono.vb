@@ -1,3 +1,3 @@
 ﻿Friend Interface IBono
-    Function CalcularBono() As Decimal
+    Function CalcularBono(department As String) As Decimal
 End Interface
