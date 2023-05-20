@@ -1,6 +1,7 @@
 ﻿Imports System.Drawing.Imaging
 Imports System.Globalization
 Imports System.IO
+Imports System.Net.Mail
 Imports System.Windows.Forms.VisualStyles.VisualStyleElement
 Imports AForge.Video
 Imports AForge.Video.DirectShow
@@ -60,12 +61,12 @@ Public Class Form1
                 Dim line As String = reader.ReadLine()
                 While line IsNot Nothing
                     Dim values As String() = line.Split(","c)
-                    ComboBox2.Items.Add(values(0))
+                    comboBox2.Items.Add(values(0))
                     line = reader.ReadLine()
                 End While
             End Using
         End If
-        ComboBox2.Text = ComboBox2.Items(0).ToString()
+        comboBox2.Text = ComboBox2.Items(0).ToString()
     End Sub
 
     ''' <summary>
@@ -223,6 +224,7 @@ Public Class Form1
             Dim saveFileDialog As New SaveFileDialog()
             saveFileDialog.Filter = "Archivos PDF|*.pdf"
             saveFileDialog.Title = "Guardar como PDF"
+
             If saveFileDialog.ShowDialog() = DialogResult.OK Then
                 ' Crea un documento PDF
                 Dim doc As New Document()
@@ -257,9 +259,26 @@ Public Class Form1
                     ' Cierra el documento PDF
                     doc.Close()
 
-                    MessageBox.Show("PDF creado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    ' Crea un mensaje de correo electrónico
+                    Dim mailMessage As New MailMessage()
+                    mailMessage.From = New MailAddress("andresvazquezo1@hotmail.com")
+                    mailMessage.To.Add("andresvazquezo1@hotmail.com")
+                    mailMessage.Subject = "Payroll PDF"
+                    mailMessage.Body = "You will find the Payroll.pdf file attached in this mail."
+
+                    ' Adjunta el archivo PDF al mensaje de correo electrónico
+                    Dim attachment As New Attachment(saveFileDialog.FileName)
+                    mailMessage.Attachments.Add(attachment)
+
+                    ' Configura el cliente SMTP y envía el correo electrónico
+                    Dim smtpClient As New SmtpClient("smtp-mail.outlook.com", 587)
+                    smtpClient.EnableSsl = True
+                    smtpClient.Credentials = New System.Net.NetworkCredential("andresvazquezo1@hotmail.com", "acereros27")
+                    smtpClient.Send(mailMessage)
+
+                    MessageBox.Show("Correo electrónico enviado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Catch ex As Exception
-                    MessageBox.Show("Error al crear el PDF: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                    MessageBox.Show("Error al crear el PDF o enviar el correo electrónico: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End Try
             End If
         Else
